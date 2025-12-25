@@ -1,0 +1,8 @@
+langchain-core
+langchain-openai
+langchain-community
+langgraph
+chromadb
+pypdf
+requests
+python-dotenv
