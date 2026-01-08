@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Assistant AI - Your Smart Travel Companion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-plane-departure logo-icon"></i>
+                <h1 class="logo-text">Travel Assistant AI</h1>
+            </div>
+            <p class="tagline">Your smart companion for weather, translations, and travel information</p>
+        </header>
+
+        <div class="app-wrapper">
+            <!-- Main Chat Interface -->
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2 class="chat-title">Travel Assistant</h2>
+                    <div class="status">
+                        <div class="status-dot"></div>
+                        <span>Assistant is online</span>
+                    </div>
+                </div>
+                
+                <div class="messages-container" id="messagesContainer">
+                    <!-- Initial welcome message -->
+                    <div class="message assistant-message">
+                        <div class="tool-indicator">
+                            <i class="fas fa-robot tool-icon"></i>
+                            Travel Assistant AI
+                        </div>
+                        Hello! I'm your AI travel assistant. I can help you with:
+                        <br><br>
+                        🌤️ <strong>Weather</strong> - Ask about weather in any city
+                        <br>
+                        📚 <strong>Dictionary</strong> - Look up word meanings
+                        <br>
+                        🔍 <strong>Web Search</strong> - Find travel information
+                        <br><br>
+                        How can I assist you today?
+                    </div>
+                </div>
+                
+                <div class="input-container">
+                    <input 
+                        type="text" 
+                        class="city-input" 
+                        id="cityInput" 
+                        placeholder="Enter city (optional)"
+                        autocomplete="off"
+                    >
+                    <input 
+                        type="text" 
+                        class="message-input" 
+                        id="messageInput" 
+                        placeholder="Ask me anything about travel..." 
+                        autocomplete="off"
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i> Send
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Sidebar with Tools and Examples -->
+            <div class="sidebar">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-tools"></i> Available Tools
+                </h3>
+                
+                <div class="tool-card">
+                    <div class="tool-icon-large">
+                        <i class="fas fa-cloud-sun"></i>
+                    </div>
+                    <div class="tool-name">Weather</div>
+                    <div class="tool-desc">Get current weather conditions for any city worldwide.</div>
+                    <div class="example" onclick="setExample('What is the weather like in Tokyo?', 'Tokyo')">
+                        <i class="fas fa-lightbulb"></i> "What's the weather in Paris?"
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon-large">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="tool-name">Dictionary</div>
+                    <div class="tool-desc">Look up definitions and meanings of words in multiple languages.</div>
+                    <div class="example" onclick="setExample('What does &quot;culinary&quot; mean?', '')">
+                        <i class="fas fa-lightbulb"></i> "Define 'adventure'"
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <div class="tool-icon-large">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="tool-name">Web Search</div>
+                    <div class="tool-desc">Find travel information, attractions, hotels, and more.</div>
+                    <div class="example" onclick="setExample('Find the best restaurants in Rome', 'Rome')">
+                        <i class="fas fa-lightbulb"></i> "Search hotels in New York"
+                    </div>
+                </div>
+                
+                <h3 class="sidebar-title" style="margin-top: 2rem;">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </h3>
+                
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="setExample('Weather forecast for London', 'London')">
+                        <i class="fas fa-cloud"></i> London Weather
+                    </button>
+                    <button class="quick-btn" onclick="setExample('Define &quot;itinerary&quot;', '')">
+                        <i class="fas fa-book"></i> Define Word
+                    </button>
+                    <button class="quick-btn" onclick="setExample('Top attractions in Barcelona', 'Barcelona')">
+                        <i class="fas fa-landmark"></i> Barcelona Guide
+                    </button>
+                    <button class="quick-btn" onclick="setExample('Best time to visit Japan', 'Japan')">
+                        <i class="fas fa-calendar"></i> Travel Timing
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Travel Assistant AI © 2024 | Powered by OpenAI & FastAPI</p>
+        <p>Your intelligent travel companion for weather, translations, and travel research</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

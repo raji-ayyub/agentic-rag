@@ -2,24 +2,44 @@
 
 from ddgs import DDGS
 import random
+import os
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 # ---------------- WEATHER TOOL ---------------- #
 
 class WeatherTool:
     """
-    Simulates weather conditions for a given city.
+    uses realtime weather data from openweather map to get weather conditions for a given city.
     Useful for travel advice and planning.
     """
 
     CONDITIONS = ["sunny", "cloudy", "rainy", "stormy", "windy"]
+    
+    def get_weather_api(self, city: str) -> dict:
+        url = "https://api.openweathermap.org/data/2.5/weather"
+        WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
 
-    def get_weather(self, city: str) -> dict:
+        params = {
+            "q": city,
+            "appid": WEATHER_API_KEY,
+            "units": "metric"
+        }
+
+        response = requests.get(url, params=params)
+        data = response.json()
+
+        if response.status_code != 200:
+            return {"error": data.get("message", "Weather API error")}
+
         return {
             "city": city,
-            "temperature": random.randint(18, 35),
-            "condition": random.choice(self.CONDITIONS),
-            "humidity": random.randint(40, 90),
+            "temperature": data["main"]["temp"],
+            "condition": data["weather"][0]["description"],
+            "humidity": data["main"]["humidity"]
         }
 
 
