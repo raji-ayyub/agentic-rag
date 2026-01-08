@@ -2,8 +2,10 @@
 
 import time
 from collections import Counter
+from typing import Optional
 
-from app import TravelAssistant, TravelState
+from app import TravelAssistant
+from langchain_core.messages import ToolMessage
 
 
 assistant = TravelAssistant()
@@ -50,6 +52,19 @@ TEST_CASES = [
 latencies = []
 tool_usage = Counter()
 failures = 0
+tool_mismatches = 0
+
+
+# ---------------- HELPERS ---------------- #
+
+def extract_tool_used(messages) -> Optional[str]:
+    """
+    Extract the first tool used from LangGraph messages.
+    """
+    for msg in messages:
+        if isinstance(msg, ToolMessage):
+            return msg.name
+    return None
 
 
 # ---------------- RUN TESTS ---------------- #
@@ -57,39 +72,40 @@ failures = 0
 print("\n🧪 Running Travel Assistant System Tests...\n")
 
 for i, case in enumerate(TEST_CASES, start=1):
-    state: TravelState = {
-        "question": case["question"],
-        "city": case["city"],
-        "answer": None,
-    }
-
     start = time.time()
 
     try:
-        result = assistant.run(state)
+        result = assistant.run(
+            {
+                "question": case["question"],
+                "city": case["city"],
+            }
+        )
+
         elapsed = time.time() - start
         latencies.append(elapsed)
 
-        answer = result["answer"]
+        answer = result.get("answer", "")
+        messages = result.get("messages", [])
 
-        # Infer tool used from answer content (pragmatic approach)
-        if "Weather in" in answer:
-            used_tool = "get_weather"
-        elif "Definition not found" in answer or "document" in answer.lower():
-            used_tool = "define_word"
+        used_tool = extract_tool_used(messages)
+        expected_tool = case["expected_tool"]
+
+        if used_tool:
+            tool_usage[used_tool] += 1
+
+        if used_tool == expected_tool:
+            status = "✅ PASS"
         else:
-            used_tool = "web_search"
-
-        tool_usage[used_tool] += 1
-
-        status = "✅ PASS" if used_tool == case["expected_tool"] else "⚠️ TOOL MISMATCH"
+            status = "⚠️ TOOL MISMATCH"
+            tool_mismatches += 1
 
         print(f"[{i}] {status}")
-        print(f"   Question: {case['question']}")
-        print(f"   Expected Tool: {case['expected_tool']}")
-        print(f"   Used Tool: {used_tool}")
-        print(f"   Latency: {elapsed:.2f}s")
-        print(f"   Answer Preview: {answer[:120]}...\n")
+        print(f"   Question       : {case['question']}")
+        print(f"   Expected Tool  : {expected_tool}")
+        print(f"   Used Tool      : {used_tool}")
+        print(f"   Latency        : {elapsed:.2f}s")
+        print(f"   Answer Preview : {answer[:120]}...\n")
 
     except Exception as e:
         failures += 1
@@ -100,14 +116,15 @@ for i, case in enumerate(TEST_CASES, start=1):
 # ---------------- SUMMARY ---------------- #
 
 print("\n📊 TEST SUMMARY")
-print("-" * 40)
+print("-" * 45)
 
 total = len(TEST_CASES)
 avg_latency = sum(latencies) / len(latencies) if latencies else 0
 
-print(f"Total Tests Run: {total}")
-print(f"Failures: {failures}")
-print(f"Average Latency: {avg_latency:.2f}s")
+print(f"Total Tests Run      : {total}")
+print(f"Failures             : {failures}")
+print(f"Tool Mismatches      : {tool_mismatches}")
+print(f"Average Latency      : {avg_latency:.2f}s")
 
 print("\nTool Usage Breakdown:")
 for tool, count in tool_usage.items():
